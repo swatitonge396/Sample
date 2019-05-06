@@ -10,9 +10,9 @@ namespace Helpers
     public static class EmailLogger
     {
        
-        private static MailAddress _fromAddress = new MailAddress("qatservice@quickenloans.com");
-        private static string _networkUser = "mi\\qatservice";
-        private static string _networkPass = "VhkPbol6CO7vdBTEenZc";
+        private static MailAddress _fromAddress = new MailAddress("email address")
+        private static string _networkUser ="user"
+        private static string _networkPass = "pass";
         private static string[] _recipientList;
 
         public static bool Log(string logFile, string emailList, string subject, string body, params string[] attachements)
