@@ -1,0 +1,63 @@
+using System;
+using System.Net;
+using System.Net.Mail;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+
+
+namespace Helpers
+{
+    public static class EmailLogger
+    {
+       
+        private static MailAddress _fromAddress = new MailAddress("");
+        private static string _networkUser = "";
+        private static string _networkPass = "";
+        private static string[] _recipientList;
+
+        public static bool Log(string emailList, string subject, string body, params string[] attachements)
+        {
+            ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+            _recipientList = emailList.Split(",");
+            try
+            {
+                foreach (string toAddress in _recipientList)
+                {
+                    MailAddress recipient = new MailAddress(toAddress);
+
+
+                    var smtp = new SmtpClient
+                    {
+                        Host = "mailgw1.rockfin.com",
+                        Port = 25,
+                        EnableSsl = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        UseDefaultCredentials = false,
+                        Credentials = new System.Net.NetworkCredential(_networkUser, _networkPass)
+                    };
+                    using (var message = new MailMessage(_fromAddress, recipient) { Subject = subject, Body = body })
+                    {
+
+                        foreach (string attachment in attachements)
+                        {
+                            message.Attachments.Add(new Attachment(attachment));
+                        }
+                        smtp.Send(message);
+
+                    }
+
+                }
+                Console.WriteLine("Done sending email ");
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error- while sending email ");
+
+                throw e;
+            }
+
+            return true;
+        }
+    }
+}
