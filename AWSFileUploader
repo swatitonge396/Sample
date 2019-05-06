@@ -1,0 +1,57 @@
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using System;
+
+namespace Helpers
+{
+    public class FileUploaderToAWS
+    {
+        private string accessKey;
+        private string secretKey;
+        private string bucket;
+        private string folder;
+        private string file;
+
+        public FileUploaderToAWS(string _accessKey, string _secreteKey, string _bucket, string _folder, string _file)
+        {
+            accessKey = _accessKey;
+            secretKey = _secreteKey;
+            bucket = _bucket;
+            folder = _folder;
+            file = _file;
+        }
+
+        public void SendMyFileToS3()
+        {
+
+
+            string key = $@"{folder}{file}";
+
+            try
+            {
+
+
+                AmazonS3Config config = new AmazonS3Config()
+                {
+                    UseHttp = true,
+                    //RegionEndpoint = RegionEndpoint.USEast2
+                    RegionEndpoint = RegionEndpoint.USWest2
+                };
+
+                IAmazonS3 client = new AmazonS3Client(accessKey, secretKey, config); //create aws client
+
+                TransferUtility utility = new TransferUtility(client);
+
+                utility.Upload(file, bucket, key); //commensing the transfer
+
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            { Console.WriteLine(amazonS3Exception.ToString()); throw amazonS3Exception; }
+            catch (Exception e)
+            { Console.WriteLine(e.ToString()); throw new System.IO.FileNotFoundException("Invalid Operation"); }
+
+        }
+
+    }
+}
